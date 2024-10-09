@@ -35,9 +35,16 @@ def process_pdf_function(req: func.HttpRequest) -> func.HttpResponse:
         response.raise_for_status()
         pdf_content = response.content
 
-        # Use your provided endpoint and key
-        endpoint = "https://docint-qima-pdf-test.cognitiveservices.azure.com/"
-        key = "1f16f9b39bd6416ebf58663798896cd6"
+        # Retrieve endpoint and key from environment variables
+        endpoint = os.environ.get("AZURE_FORM_RECOGNIZER_ENDPOINT")
+        key = os.environ.get("AZURE_FORM_RECOGNIZER_KEY")
+
+        if not endpoint or not key:
+            logging.error("Endpoint or key not found in environment variables.")
+            return func.HttpResponse(
+                "Internal server error: Missing endpoint or key configuration.",
+                status_code=500
+            )
 
         # Create a DocumentAnalysisClient
         document_analysis_client = DocumentAnalysisClient(
